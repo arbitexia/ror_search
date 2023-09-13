@@ -1,0 +1,23 @@
+<%= link_to '+ New Vendor', new_client_vendor_path(@client) %>
+<br />
+<%= link_to '+ Add Multiple Vendors', new_batch_client_vendors_path(@client) %>
+<br />
+<%= link_to '- Delete All Vendors', destroy_all_client_vendors_path(@client), data: { method: :delete, confirm: "Are you sure you wish to delete ALL vendors under #{@client.legal_business_name}?" }, class: :delete %>
+<br />
+
+<table class="portal-table" cellspacing="0" cellpadding="0" border="0">
+  <tr>
+    <th>Name</th>
+    <th>Actions</th>
+  </tr>
+
+  <% vendors.each do |vendor| %>
+      <tr>
+        <td><%= vendor.display_name %></td>
+        <td>
+          <%= link_to 'Edit', edit_client_vendor_path(vendor.client, vendor, page: params[:page]), class: :main %>
+          <%= link_to 'Delete', client_vendor_path(vendor.client, vendor, page: params[:page]), data: { method: :delete, confirm: "Are you sure you wish to delete #{vendor.name}?" }, class: :delete %>
+        </td>
+      </tr>
+  <% end %>
+</table>

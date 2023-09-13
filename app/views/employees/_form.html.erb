@@ -1,0 +1,107 @@
+<%= form_for(@employee, url: url) do |f| %>
+  <% if @employee.errors.present? %>
+    <div class="errors">
+      <%= raw @employee.errors.full_messages.join('<br />') %>
+    </div>
+  <% end %>
+
+  <ul class="info">
+    <%= render partial: 'entry_info' %>
+  </ul>
+
+  <% if @employee.id.present? %>
+    <div class="field">
+      <p>Created on <%= @employee.created_at_pretty %></p>
+      <p>Last updated on <%= @employee.updated_at_pretty %></p>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :first_name %>
+    <%= f.text_field :first_name, disabled: @employee.from_external_sync? %>
+  </div>
+
+  <div class="field">
+    <%= f.label :middle_name %>
+    <%= f.text_field :middle_name, disabled: @employee.from_external_sync? %>
+  </div>
+
+  <div class="field">
+    <%= f.label :last_name %>
+    <%= f.text_field :last_name, disabled: @employee.from_external_sync? %>
+  </div>
+
+  <div class="field">
+    <%= f.label :dob, 'Date of Birth' %>
+    <%# check_box_tag :dob_enabled, 'on', selected: @employee.dob.present? %>
+    <%# f.date_select :dob, { start_year: 1900 }, style: @employee.dob.present? ? '' : 'display: none' %>
+    <%= f.text_field :dob, value: @employee.dob&.strftime('%m%d%Y'), data: { pattern: '{{99}}/{{99}}/{{9999}}' }, disabled: @employee.from_external_sync? %>
+  </div>
+
+  <div class="field">
+    <%= f.label :ssn, 'SSN' %>
+    <%= f.text_field :ssn, data: { pattern: '{{999}}-{{99}}-{{9999}}' }, disabled: @employee.from_external_sync? %>
+  </div>
+
+  <div class="field">
+    <%= f.label :la_license_type, 'Louisiana License Type (optional)' %>
+    <%= f.select :la_license_type, Employee.la_license_type.values %>
+  </div>
+
+  <div class="field">
+    <%= f.label :la_license_number, 'Louisiana Medical License Number (optional)' %>
+    <%= f.text_field :la_license_number, disabled: @employee.from_external_sync? %>
+  </div>
+
+  <div class="field">
+    <%= f.label :tx_license_number, 'Texas Medical License Number (optional)' %>
+    <%= f.text_field :tx_license_number, disabled: @employee.from_external_sync? %>
+  </div>
+
+  <% if @employee.isolved_id.present? %>
+    <p><strong>Since this employee is synced from iSolved, you are not able to edit their name, date of birth, or
+      SSN.</strong></p>
+  <% end %>
+
+  <% if @employee.central_management_id.present? %>
+    <p>
+      <strong>Since this employee is synced from Central Management, you are not able to edit their name, date of birth,
+        or SSN.</strong></p>
+  <% end %>
+
+  <% if @employee.ukg_id.present? %>
+    <p>
+      <strong>Since this employee is synced from UKG, you are not able to edit their name, date of birth,
+        or SSN.</strong></p>
+  <% end %>
+
+  <br/>
+
+  <div class="field">
+    <%= f.label :blocked_searchers, raw('Hide Searches On:<br /><br/>click to select<br/>CMD+click to deselect<br/>(CTRL+click on Windows)') %>
+    <%= f.select(:blocked_searchers, ClientSearcher.employee_searcher_collection, {}, style: "width: 200px; height: 150px;", multiple: true) %>
+  </div>
+
+  <br/>
+
+  <div class="field">
+    <%= f.label :notes, 'Notes' %>
+    <%= f.text_area :notes, style: 'min-width: 190px; min-height: 100px' %>
+    <% if @employee.notes_updated_by.present? %>
+      <br />
+      <br />
+      (notes last updated by <%= @employee.notes_updated_by.name %> on <%= @employee.notes_updated_at.strftime('%m/%d/%Y') %>.)
+    <% end %>
+  </div>
+
+  <br/>
+
+  <div class="field">
+    <%= label_tag :run_report_now, 'Run initial report?' %>
+    <%= check_box_tag :run_report_now %>
+  </div>
+
+  <div class="field">
+    <%= f.submit %>
+  </div>
+<% end %>

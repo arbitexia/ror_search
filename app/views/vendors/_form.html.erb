@@ -1,0 +1,93 @@
+<%= form_for(@vendor, url: url) do |f| %>
+  <% if @vendor.errors.present? %>
+    <div class="errors">
+      <%= raw @vendor.errors.full_messages.join('<br />') %>
+    </div>
+  <% end %>
+
+  <% if @vendor.id.present? %>
+    <div class="field">
+      <p>Created on <%= @vendor.created_at_pretty %></p>
+      <p>Last updated on <%= @vendor.updated_at_pretty %></p>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name, 'Entity Name' %>
+    <%= f.text_field :name %>
+  </div>
+
+  <div>OR</div>
+
+  <div class="field">
+    <%= f.label :first_name %>
+    <%= f.text_field :first_name %>
+  </div>
+
+  <div class="field">
+    <%= f.label :middle_name %>
+    <%= f.text_field :middle_name %>
+  </div>
+
+  <div class="field">
+    <%= f.label :last_name %>
+    <%= f.text_field :last_name %>
+  </div>
+
+  <hr/>
+
+  <div class="field">
+    <%= f.label :ein, 'EIN' %>
+    <%= f.text_field :ein, maxlength: 9 %>
+  </div>
+
+  <div class="field">
+    <%= f.label :npi, 'NPI' %>
+    <%= f.text_field :npi, maxlength: 10 %>
+  </div>
+
+  <div class="field">
+    <%= f.label :la_license_type, 'Louisiana License Type (optional)' %>
+    <%= f.select :la_license_type, Vendor.la_license_type.values %>
+  </div>
+
+  <div class="field">
+    <%= f.label :la_license_number, 'Louisiana Medical License Number (optional)' %>
+    <%= f.text_field :la_license_number %>
+  </div>
+
+  <div class="field">
+    <%= f.label :tx_license_number, 'Texas Medical License Number (optional)' %>
+    <%= f.text_field :tx_license_number %>
+  </div>
+
+  <br/>
+
+  <div class="field">
+    <%= f.label :blocked_searchers, raw('Hide Searches On:<br /><br/>click to select<br/>CMD+click to deselect<br/>(CTRL+click on Windows)') %>
+    <%= f.select(:blocked_searchers, ClientSearcher.vendor_searcher_collection, {}, style: "width: 200px; height: 150px;", multiple: true) %>
+  </div>
+
+  <br/>
+
+  <div class="field">
+    <%= f.label :notes, 'Notes' %>
+    <%= f.text_area :notes, style: 'min-width: 190px; min-height: 100px' %>
+    <% if @vendor.notes_updated_by.present? %>
+      <br />
+      <br />
+      (notes last updated by <%= @vendor.notes_updated_by.name %> on <%= @vendor.notes_updated_at.strftime('%m/%d/%Y') %>.)
+    <% end %>
+  </div>
+
+  <br/>
+
+  <div class="field">
+    <%= label_tag :run_report_now, 'Run initial report?' %>
+    <%= check_box_tag :run_report_now %>
+  </div>
+
+  <div class="field">
+    <%= f.submit %>
+  </div>
+<% end %>

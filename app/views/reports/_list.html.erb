@@ -1,0 +1,78 @@
+<% unless @client.recursively_deactivated? %>
+  <%= link_to '+ Run a Report Now', client_reports_path(@client), method: :post %>
+<% end %>
+
+<% if @client.next_report_at.present? %>
+  <p>
+    Next report scheduled for: <%= @client.next_report_at.to_formatted_s(:long) %>
+    <em>(reports run on the <%= @client.monthly_report_day.ordinalize %> of the month)</em>
+  </p>
+<% end %>
+
+<% if current_user.is_admin? %>
+  <pre>Last automatic report info text: <%= @client.automatic_report_info %></pre>
+<% end %>
+
+<table class="portal-table" cellspacing="0" cellpadding="0" border="0">
+  <tr>
+    <th>Date</th>
+    <th>Status</th>
+    <th>Requested By</th>
+    <th>Actions</th>
+  </tr>
+
+  <% @reports.each do |report| %>
+      <tr>
+        <td>
+          <%# report.created_at.strftime('%a, %b %e, %l:%M %p') %>
+          <%= report.created_at.strftime('%a, %b %e') %>
+        </td>
+        <td>
+          <% if report.progress.present? %>
+              Generating
+              &bull;
+              <% if report.progress < 0.0001 %>
+                  Running Facilities
+              <% else %>
+                  <%= number_to_percentage report.progress * 100, precision: 2 %>
+              <% end %>
+          <% elsif report.data.present? %>
+              <!-- Complete -->
+              <% if report.num_flagged_records.zero? %>
+                  all passed
+              <% else %>
+                  <strong><%= pluralize report.num_potential_matches, 'potential violation' %></strong>
+                  <br/>
+                  <strong><%= pluralize report.num_positive_matches, 'positive violation' %></strong>
+                  <br />
+                  <strong><%= pluralize report.num_expired_matches, 'expiration' %></strong>
+                  <br/>
+                  <strong><%= pluralize report.num_excluded_matches, 'hidden match' %></strong>
+              <% end %>
+          <% elsif report.status == 'pending' %>
+              Pending
+          <% else %>
+              Queued
+          <% end %>
+        </td>
+        <td>
+          <%= report.source %>
+        </td>
+        <td>
+          <% if report.progress.present? %>
+            <% if DateTime.now.to_i - report.updated_at.to_i > 1.hour.to_i %>
+              <%= link_to 'Stuck? Re-run', rerun_client_report_path(@client, report), class: :main %>
+            <% else %>
+              <%= link_to 'Refresh Progress', request.url, class: :main %>
+            <% end %>
+          <% elsif report.data.present? %>
+              <%= link_to 'Read Report', client_report_path(@client, report), class: :main %>
+          <% elsif report.error.present? %>
+              <%= link_to 'Re-run', rerun_client_report_path(@client, report), class: :main %>
+          <% else %>
+              <%= link_to 'Refresh Progress', request.url, class: :main %>
+          <% end %>
+        </td>
+      </tr>
+  <% end %>
+</table>

@@ -1,0 +1,19 @@
+<%= @client.legal_business_name %><br />
+<%= @client.mailing_address %><br />
+<%= @client.mailing_city %>, <%= @client.mailing_state %> <%= @client.mailing_zip %><br />
+<br />
+<br />
+<%= Date.today.to_formatted_s(:long) %><br />
+Dear <%= @applicant_name %>,<br />
+<br />
+A decision is currently pending concerning your application for employment at <%= @client.legal_business_name %>.  <br />
+<br />
+We are forwarding a copy of the consumer report that you authorized in regard to your application for employment, together with a “Summary of Rights Under the Fair Credit Reporting Act.” The contents of the enclosed report are currently under review in consideration of your employment.<br />
+<br />
+If this report contains any information that is inaccurate or incomplete, you should contact our office immediately so that the corrected information can be reviewed prior to an employment decision being made.<br />
+<br />
+Regards,<br />
+<br />
+<%= @client.legal_business_name %><br />
+
+<script>window.print();</script>

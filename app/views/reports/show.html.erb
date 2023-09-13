@@ -1,0 +1,332 @@
+<%= client_header(@report.created_at.to_date.to_formatted_s(:long), @client, request.referrer) %>
+
+<% if @employees_mask.present? || @vendors_mask.present? %>
+  <script type="text/javascript">window.print()</script>
+<% end %>
+
+<h3>
+  Report run by:
+  <%= @report.source || @client.user.name %>
+</h3>
+
+<p class="report-info">
+  Compliance Notice to our valued employers: Before taking an adverse action against the person named in this report you
+  must provide him or her with a first pre-adverse action notice, a copy of this report, and a copy of “A Summary of
+  Your Rights Under the Fair Credit Reporting Act.” You should provide the person a reasonable amount of time to respond
+  to your notice. If after hearing the individual’s response you determine to continue with the adverse action you must
+  provide a second post-adverse action notice. You must provide notice even if the information in the report plays only
+  a small part in the overall decision. Additional notice requirements may apply in certain states. Sanction Search
+  provides you with the content and format of these required notices in the addendums to your Customer Service Agreement
+  or at <%= link_to 'sanctionsearch.net/compliance.html', '/compliance.html' %>. For tools to help you generate these
+  required notices refer to the Sanction Search office.
+</p>
+
+<h4>Sites Searched</h4>
+<p>
+  <% @report.client.client_searchers.enabled.order("searcher asc").each do |client_searcher| %>
+    <%= link_to ClientSearcher.reverse_searcher_map[client_searcher.searcher], client_searcher.searcher_url, target: :_blank %><br/>
+  <% end %>
+</p>
+
+<div style="page-break-inside: avoid;">
+  <h4>Employees</h4>
+  <p>
+    Checked: <span class="blue"><%= @report.data['employees'].count %></span>
+    <br/>
+    Positive violations:
+    <% if @report.summary[:employees][:positive].zero? %>
+      <span class="blue">0</span>
+    <% else %>
+      <span class="red"><%= @report.summary[:employees][:positive] %></span>
+    <% end %>
+    <br/>
+    Potential violations:
+    <% if @report.summary[:employees][:potential].zero? %>
+      <span class="blue">0</span>
+    <% else %>
+      <span class="red"><%= @report.summary[:employees][:potential] %></span>
+    <% end %>
+    <br/>
+    Expirations:
+    <% if @report.summary[:employees][:expired].zero? %>
+      <span class="blue">0</span>
+    <% else %>
+      <span class="red"><%= @report.summary[:employees][:expired] %></span>
+    <% end %>
+    <br/>
+    Hidden matches:
+    <% if @report.summary[:employees][:excluded].zero? %>
+      <span class="blue">0</span>
+    <% else %>
+      <span class="red"><%= @report.summary[:employees][:excluded] %></span>
+    <% end %>
+    <br/>
+    Cleared: <span class="blue"><%= @report.summary[:employees][:cleared] %></span>
+  </p>
+</div>
+
+<div style="page-break-inside: avoid;">
+  <h4>Vendors</h4>
+  <p>
+    Checked: <span class="blue"><%= @report.data['vendors'].count %></span>
+    <br/>
+    Positive violations:
+    <% if @report.summary[:vendors][:positive].zero? %>
+      <span class="blue">0</span>
+    <% else %>
+      <span class="red"><%= @report.summary[:vendors][:positive] %></span>
+    <% end %>
+    <br/>
+    Potential violations:
+    <% if @report.summary[:vendors][:potential].zero? %>
+      <span class="blue">0</span>
+    <% else %>
+      <span class="red"><%= @report.summary[:vendors][:potential] %></span>
+    <% end %>
+    <br/>
+    Expirations:
+    <% if @report.summary[:vendors][:expired].zero? %>
+      <span class="blue">0</span>
+    <% else %>
+      <span class="red"><%= @report.summary[:vendors][:expired] %></span>
+    <% end %>
+    <br/>
+    Hidden matches:
+    <% if @report.summary[:vendors][:excluded].zero? %>
+      <span class="blue">0</span>
+    <% else %>
+      <span class="red"><%= @report.summary[:vendors][:excluded] %></span>
+    <% end %>
+    <br/>
+    Cleared: <span class="blue"><%= @report.summary[:vendors][:cleared] %></span>
+  </p>
+</div>
+<!--
+<h4>
+  <%= @report.data['employees'].count %> employees and <%= @report.data['vendors'].count %> vendors were checked.
+</h4>
+
+<h4>
+  Positive matches:
+  <% if @report.num_positive_matches.zero? %>
+      <span class="blue">0</span>
+  <% else %>
+      <span class="red"><%= @report.num_positive_matches %></span>
+  <% end %>
+  <br/>
+  Potential matches:
+  <% if @report.num_potential_matches.zero? %>
+      <span class="blue">0</span>
+  <% else %>
+      <span class="red"><%= @report.num_potential_matches %></span>
+  <% end %>
+  <br/>
+  Cleared: <span class="blue"><%= @report.num_total_records - @report.num_flagged_records %></span>
+</h4>
+-->
+
+<% if params[:hits_only].nil? %>
+  <h3>Viewing all records</h3>
+  <%= link_to 'See only matches', action: :show, hits_only: true %>
+<% else %>
+  <h3>Viewing only matches</h3>
+  <%= link_to 'See all records', action: :show, hits_only: nil %>
+<% end %>
+
+
+<h3>
+  <a href="javascript:;" class="print-report-link"><%= "Print Report"%></a>
+</h3>
+<p>Prints every employee and vendor on the list.  If one or more checkboxes are selected next to a name, only the selected will be printed.</p>
+
+<h3>
+  <a href="javascript:;" class="print-report-employees-link">Print employees only</a>
+</h3>
+<h3>
+  <a href="javascript:;" class="print-report-vendors-link">Print vendors only</a>
+</h3>
+
+<% if @employees_mask.nil? || @employees_mask.count > 0 %>
+  <h2>Employees</h2>
+
+  <% @report.data['employees']
+         .select {|record| params[:hits_only].present? ? record['results'].present? : true}
+         .sort {|a, b| a['employee']['last_name'].downcase <=> b['employee']['last_name'].downcase}
+         .each do |record| %>
+    <% next if @employees_mask.present? && !@employees_mask.include?(record['employee']['id']) %>
+    <div class="employee-<%= record['employee']['id'] %>" style="page-break-inside: avoid;">
+      <h3>
+        <%= record['employee']['last_name'] %>,
+        <%= record['employee']['first_name'] %>
+        <%= record['employee']['middle_name'] %>
+        <input type="checkbox" name="employees_to_print[]" value="<%= record['employee']['id'] %>"/>
+      </h3>
+
+      <%= link_to 'Edit Employee', edit_client_employee_path(record['employee']['client_id'],
+                                   record['employee']['id']), class: "ignore-print" %>
+
+      <p class="ignore-print">
+        <span>Print:</span>
+        <%# link_to 'Pre-Adverse Action Letter', controller: 'reports', action: 'pre_adverse_action_report', client_id: @client.id, applicant_name: "#{record['employee']['first_name']} #{record['employee']['last_name']}" %>
+        <%= link_to 'Pre-Adverse Action Letter', 'javascript:;', class: 'print-pre-letter', data: { url: url_for(controller: 'reports', action: 'pre_adverse_action_report', client_id: @client.id, applicant_name: "#{record['employee']['first_name']} #{record['employee']['last_name']}") } %>
+        <span>&bull;</span>
+        <%# link_to 'Summary of Rights Under FCRA', controller: 'reports', action: 'fcra_summary', client_id: @client.id %>
+        <%= link_to 'Summary of Rights Under FCRA', 'javascript:;', class: 'print-summary', data: { url: '/fcra_summary.pdf' } %>
+        <span>&bull;</span>
+        <%# link_to 'Adverse Action Letter', controller: 'reports', action: 'adverse_action_report', client_id: @client.id, applicant_name: "#{record['employee']['first_name']} #{record['employee']['last_name']}" %>
+        <%= link_to 'Adverse Action Letter', 'javascript:;', class: 'print-letter', data: { url: url_for(controller: 'reports', action: 'adverse_action_report', client_id: @client.id, applicant_name: "#{record['employee']['first_name']} #{record['employee']['last_name']}") } %>
+      </p>
+
+      <% employee = @employees.find { |employee| employee.id == record['employee']['id'] } %>
+
+      <% if record['results'].empty? %>
+        <div class="blue match-type">Passed - No Violations or Expirations Found</div>
+      <% else %>
+        <%# Display a message explaining if any searchers' results were excluded %>
+        <% excluded_searchers = [] %>
+        <% if employee.present? %>
+          <% all_result_searchers = record['results'].map { |result| result['searcher'] }.compact %>
+          <% (record['blocked_searchers'] || record['employee']['blocked_searchers'] || []).each do |searcher| %>
+            <% if all_result_searchers.include?(searcher) %>
+              <% excluded_searchers << searcher %>
+            <% end %>
+          <% end %>
+        <% end %>
+
+        <% if excluded_searchers.count > 0 %>
+          <p>
+            <strong>Excluding some results from: <%= excluded_searchers.map { |searcher| ClientSearcher.reverse_searcher_map[searcher] }.join(", ") %></strong>
+            <br />
+            Please use the 'Edit Employee' link above to unblock some of these searches for this employee if you would like to view excluded results.
+          </p>
+        <% end %>
+
+        <table class="portal-table" cellspacing="0" cellpadding="0" border="0">
+          <tr></tr>
+
+          <% record['results'].each do |result| %>
+            <% next if (record['blocked_searchers'] || record['employee']['blocked_searchers'] || []).include?(result['searcher']) %>
+            <% if result['details'].present? %>
+              <tr>
+                <td>
+                  <% if result['type'] == 'expiry' %>
+                    <div class="match-type">Certification Expired</div>
+                  <% elsif Report.positive_employee_result?(result, record) %>
+                    <div class="red match-type">Positive Violation</div>
+                  <% else %>
+                    <div class="match-type">Potential Violation</div>
+                  <% end %>
+                  <%= raw result['details'].strip.gsub("\n", "<br/>") %>
+                </td>
+              </tr>
+            <% end %>
+          <% end %>
+        </table>
+      <% end %>
+
+      <% if employee.present? && employee.notes.present? %>
+        <p>
+          <strong>Notes:</strong>
+        <pre>
+          <%= employee.notes %>
+        </pre>
+        </p>
+      <% end %>
+
+      <div class="ignore-print">
+        <br/>
+        <hr/>
+      </div>
+    </div>
+  <% end %>
+<% end %>
+
+<% if @vendors_mask.nil? || @vendors_mask.count > 0 %>
+  <h2>Vendors</h2>
+
+  <% @report.data['vendors']
+         .select {|record| params[:hits_only].present? ? record['results'].present? : true}
+         .sort {|a, b| (a['vendor']['last_name'].present? ? a['vendor']['last_name'] : a['vendor']['name']).downcase <=> (b['vendor']['last_name'].present? ? b['vendor']['last_name'] : b['vendor']['name']).downcase}
+         .each do |record| %>
+    <% next if @vendors_mask.present? && !@vendors_mask.include?(record['vendor']['id']) %>
+    <h3>
+      <%= record['vendor']['last_name'].present? ? "#{record['vendor']['last_name']}, #{record['vendor']['first_name']} #{record['vendor']['middle_name']}" : record['vendor']['name'] %>
+      <input type="checkbox" name="vendors_to_print[]" value="<%= record['vendor']['id'] %>"/>
+    </h3>
+
+    <%= link_to 'Edit Vendor', edit_client_vendor_path(record['vendor']['client_id'], record['vendor']['id']) %>
+
+    <% vendor = @vendors.find { |vendor| vendor.id == record['vendor']['id'] } %>
+
+    <% if record['results'].empty? %>
+      <div class="blue match-type">Passed - No Violations or Expirations Found</div>
+    <% else %>
+      <%# Display a message explaining if any searchers' results were hidden %>
+      <% excluded_searchers = [] %>
+      <% if vendor.present? %>
+        <% all_result_searchers = record['results'].map { |result| result['searcher'] }.compact %>
+        <% (record['blocked_searchers'] || record['vendor']['blocked_searchers'] || []).each do |searcher| %>
+          <% if all_result_searchers.include?(searcher) %>
+            <% excluded_searchers << searcher %>
+          <% end %>
+        <% end %>
+      <% end %>
+
+      <% if excluded_searchers.count > 0 %>
+        <p>
+          <strong>Hiding some results from: <%= excluded_searchers.map { |searcher| ClientSearcher.reverse_searcher_map[searcher] }.join(", ") %></strong>
+          <br />
+          Please use the 'Edit Vendor' link above to unblock some of these searches for this vendor if you would like to view hidden results.
+        </p>
+      <% end %>
+
+      <table class="portal-table" cellspacing="0" cellpadding="0" border="0">
+        <tr></tr>
+        <% record['results'].each do |result| %>
+          <% next if (record['blocked_searchers'] || record['vendor']['blocked_searchers'] || []).include?(result['searcher']) %>
+          <% if result['details'].present? %>
+            <tr>
+              <td>
+                <% if result['type'] == 'expiry' %>
+                  <div class="match-type">Certification Expired</div>
+                <% elsif Report.positive_vendor_result?(result, record) %>
+                  <div class="red match-type">Positive Violation</div>
+                <% else %>
+                  <div class="match-type">Potential Violation</div>
+                <% end %>
+                <%= raw result['details'].strip.gsub("\n", "<br/>") %>
+              </td>
+            </tr>
+          <% end %>
+        <% end %>
+      </table>
+    <% end %>
+
+    <% if vendor.present? && vendor.notes.present? %>
+      <p>
+        <strong>Notes:</strong>
+      <pre>
+          <%= vendor.notes %>
+        </pre>
+      </p>
+    <% end %>
+
+    <br/>
+    <hr/>
+  <% end %>
+<% end %>
+
+<h3>
+  <a href="javascript:;" class="print-report-link"><%= "Print Report"%></a>
+</h3>
+<p>Prints every employee and vendor on the list.  If one or more checkboxes are selected next to a name, only the selected will be printed.</p>
+
+
+
+<style type="text/css" media="print">
+.ignore-print { display: none; }
+h3 {
+  font-size: 1em;
+  margin: 0;
+}
+</style>

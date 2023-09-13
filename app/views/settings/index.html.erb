@@ -1,0 +1,4 @@
+<header class="section-header">Settings</header>
+<% if current_user.is_admin? %>
+  <%= render partial: "enabled_searchers_for_all_clients", locals: { client: @clients.first }%>
+<% end %>

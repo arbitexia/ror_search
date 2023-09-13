@@ -1,0 +1,16 @@
+<p>Dear administrator,</p>
+
+<p>The refresh job for <%= @searcher %> just failed to run with an error.</p>
+
+<p>This could indicate a temporary service outage, an update to the website, or a change in how data is organized within the remote database file.</p>
+
+<p>If this error persists for this website, please make sure a developer takes the time to look into the exact cause.</p>
+
+<% if @e %>
+  <% if @e&.message.present? %>
+    <p> Exception Message: <%= @e&.message %> </p>
+  <% end %>
+  <% if @e&.backtrace.present? %>
+    <p> Exception backtrace: <%= @e&.backtrace %> </p>
+  <% end %>
+<% end %>

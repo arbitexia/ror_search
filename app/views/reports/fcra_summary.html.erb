@@ -1,0 +1,21 @@
+<embed
+type="application/pdf"
+src="/fcra_summary.pdf"
+id="pdfDocument"
+width="100%"
+height="100%" />
+
+<script>
+    function printDocument(documentId) {
+        var doc = document.getElementById(documentId);
+
+        //Wait until PDF is ready to print
+        if (typeof doc.print === 'undefined') {
+            setTimeout(function(){printDocument(documentId);}, 1000);
+        } else {
+            doc.print();
+        }
+    }
+
+    printDocument('pdfDocument');
+</script>

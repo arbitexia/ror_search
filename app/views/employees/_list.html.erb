@@ -1,0 +1,27 @@
+<%= link_to '+ New Employee', new_client_employee_path(@client) %>
+<br />
+<%= link_to '+ Add Multiple Employees', new_batch_client_employees_path(@client) %>
+<br />
+<%= link_to '- Delete All Employees', destroy_all_client_employees_path(@client), data: { method: :delete, confirm: "Are you sure you wish to delete ALL employees under #{@client.legal_business_name}?" }, class: :delete %>
+<br />
+
+<table class="portal-table" cellspacing="0" cellpadding="0" border="0">
+  <tr>
+    <th>Last Name</th>
+    <th>First Name</th>
+    <th></th>
+    <th>Actions</th>
+  </tr>
+
+  <% employees.each do |employee| %>
+      <tr>
+        <td><%= employee.last_name %></td>
+        <td><%= employee.first_name %></td>
+        <td><%= employee.middle_name %></td>
+        <td>
+          <%= link_to 'Edit', edit_client_employee_path(employee.client, employee, page: params[:page]), class: :main %>
+          <%= link_to 'Delete', client_employee_path(employee.client, employee, page: params[:page]), data: { method: :delete, confirm: "Are you sure you wish to delete #{employee.first_name} #{employee.last_name}?" }, class: :delete %>
+        </td>
+      </tr>
+  <% end %>
+</table>

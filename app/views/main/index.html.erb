@@ -1,0 +1,162 @@
+<% content_for(:title) { %>Sanction Search: Monitoring Made Easy
+<% } %>
+<% content_for(:meta) do %>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Sanction Search: Monitoring made easy">
+    <meta name="twitter:description" content="description">
+    <meta name="twitter:image" content="<%= image_url('logo-og') %>">
+
+    <meta property="og:title" content="Sanction Search: Monitoring Made Easy">
+    <meta property="og:url" content="http://www.sanctionsearch.net/">
+    <meta property="og:image" content="<%= image_url('logo-og') %>">
+<% end %>
+
+<% content_for(:nav) do %>
+    <div class="link"><a class="steps smoothscroll" href="#how-it-works">Three Easy Steps</a></div>
+    <div class="link"><a class="pricing smoothscroll" href="#pricing">Pricing</a></div>
+    <% if user_signed_in? %>
+        <div class="link"><a class="login emphasized" href="<%= root_path %>">Portal</a></div>
+    <% else %>
+        <div class="link"><a class="login" href="<%= new_user_session_path %>">Login</a></div>
+        <div class="link"><a class="person emphasized smoothscroll" href="#get-started">Get Started</a></div>
+    <% end %>
+<% end %>
+
+<% content_for(:content) do %>
+    <ul class="feature">
+      <li>
+        <div class="background image-3"></div>
+        <div class="overlay"></div>
+        <div class="content center">
+          <header>Monitoring Made Easy</header>
+          <aside>Keep compliant with federal and state laws</aside>
+        </div>
+      </li>
+      <li>
+        <div class="background image-1"></div>
+        <div class="overlay"></div>
+        <div class="content left">
+          <header>Monitoring Made Easy</header>
+          <aside>Save time by having searches run in one location</aside>
+        </div>
+      </li>
+      <li>
+        <div class="background image-2"></div>
+        <div class="overlay"></div>
+        <div class="content left">
+          <header>Monitoring Made Easy</header>
+          <aside>Cost effective</aside>
+        </div>
+      </li>
+    </ul>
+    <section class="splash" id="how-it-works">
+      <header>Three Easy Steps</header>
+      <ul class="steps">
+        <li>
+          <div class="number">1</div>
+          <div class="text">
+            Register with us and enter some <strong>basic information</strong> about your employees and vendors.
+          </div>
+          <div class="image image-1"></div>
+        </li>
+        <li>
+          <div class="number">2</div>
+          <div class="text">
+            Every month, we check to see if they have been <strong>flagged by federal and state agencies</strong>.
+          </div>
+          <div class="image image-2"></div>
+        </li>
+        <li>
+          <div class="number">3</div>
+          <div class="text">
+            Each month's report is available <strong>on the website</strong> for you to access at any time.
+          </div>
+          <div class="image image-3"></div>
+        </li>
+      </ul>
+    </section>
+
+    <section class="splash" id="pricing">
+      <header>Pricing</header>
+      <div class="pricing-tiers">
+        <a href="#get-started" class="smoothscroll">
+          <header>Tier 1</header>
+          <div class="count">up to 125</div>
+          <div class="employees">employees</div>
+          <div class="price">$25/month</div>
+        </a>
+        <a href="#get-started" class="smoothscroll">
+          <header>Tier 2</header>
+          <div class="count">126-400</div>
+          <div class="employees">employees</div>
+          <div class="price">$50/month</div>
+        </a>
+        <a href="#get-started" class="smoothscroll">
+          <header>Tier 3</header>
+          <div class="count">401-700</div>
+          <div class="employees">employees</div>
+          <div class="price">$80/month</div>
+        </a>
+        <a href="#get-started" class="smoothscroll">
+          <header>Tier 4</header>
+          <div class="count">701-1000</div>
+          <div class="employees">employees</div>
+          <div class="price">$100/month</div>
+        </a>
+        <a href="#get-started" class="smoothscroll">
+          <header>Tier 5</header>
+          <div class="count">1001+</div>
+          <div class="employees">employees</div>
+          <div class="price">Contact Us</div>
+        </a>
+      </div>
+    </section>
+
+    <section class="splash" id="get-started">
+      <header>Get Started</header>
+
+      <aside>Got Questions? Email <%= mail_to 'info@pmcresources.com' %> or call
+        <a href="tel:+13189655756">318-965-5756</a></aside>
+
+      <div class="form">
+        <%= form_tag '/contact', method: :post do %>
+            <%= text_field_tag :name, '', placeholder: 'Your Name', class: :field %>
+            <%= email_field_tag :email, '', placeholder: 'Your Email', class: :field %>
+            <%= text_field_tag :phone, '', placeholder: 'Your Phone Number', class: :field %>
+            <%= text_field_tag :company_name, '', placeholder: 'Company Name', class: :field %>
+            <%= number_field_tag :employees, '', placeholder: 'Estimated Number of Employees', class: :field %>
+            <%= submit_tag 'Request More Info' %>
+        <% end %>
+      </div>
+    </section>
+
+    <footer>
+      <div class="left">
+        <div class="copyright">&copy; <%= Date.today.year %> Comprehensive Screening Solutions</div>
+        <div class="terms">
+          <a href="/compliance.html">Compliance</a>
+          <br/>
+          <a href="/privacy.html">Privacy Policy</a>
+          <br/>
+          See Service Agreement for agreed upon Terms of Use.
+        </div>
+      </div>
+      <div class="right">
+        <header>Contact Sanction Search</header>
+        <div class="email">By Email: <%= mail_to 'info@pmcresources.com' %></div>
+        <div class="phone">By Phone: <a href="tel:+13189655756">318-965-5756</a></div>
+      </div>
+    </footer>
+
+    <script type="text/javascript">
+        $('.feature').lightSlider({
+            item: 1,
+            controls: true,
+            loop: true,
+            auto: true,
+            pause: 5000
+        });
+    </script>
+<% end %>

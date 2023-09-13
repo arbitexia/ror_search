@@ -1,0 +1,4 @@
+<%= client_header('Vendor Management', @client, request.referrer) %>
+
+<%= render partial: 'list', locals: { vendors: @vendors } %>
+<%= will_paginate @vendors %>

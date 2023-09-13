@@ -1,0 +1,74 @@
+<% content_for(:content) do %>
+    <section id="outer-wrap">
+      <header class="section-header">Log in</header>
+
+      <%= render partial: 'shared/flash' %>
+
+      <div class="form">
+        <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+            <div class="field">
+              <%= f.email_field :email, autofocus: true, placeholder: 'Email' %>
+            </div>
+
+            <div class="field">
+              <%= f.password_field :password, autocomplete: "off", placeholder: 'Password' %>
+            </div>
+
+            <% if devise_mapping.rememberable? -%>
+                <div class="field">
+                  <%= f.check_box :remember_me %>
+                  <%= f.label :remember_me, style: 'width: auto' %>
+                </div>
+            <% end -%>
+
+            <div class="actions">
+              <%= f.submit "Log in" %>
+            </div>
+        <% end %>
+      </div>
+
+      <%= render "devise/shared/links" %>
+
+      <br/>
+    </section>
+
+    <ul class="feature">
+      <li>
+        <div class="background image-3"></div>
+        <div class="overlay"></div>
+        <div class="content center">
+          <header>Monitoring Made Easy</header>
+          <aside>Keep compliant with federal and state laws</aside>
+        </div>
+      </li>
+      <li>
+        <div class="background image-1"></div>
+        <div class="overlay"></div>
+        <div class="content left">
+          <header>Monitoring Made Easy</header>
+          <aside>Save time by having searches run in one location</aside>
+        </div>
+      </li>
+      <li>
+        <div class="background image-2"></div>
+        <div class="overlay"></div>
+        <div class="content left">
+          <header>Monitoring Made Easy</header>
+          <aside>Cost effective</aside>
+        </div>
+      </li>
+    </ul>
+
+    <br/>
+    <br/>
+
+    <script type="text/javascript">
+        $('.feature').lightSlider({
+            item: 1,
+            controls: true,
+            loop: true,
+            auto: true,
+            pause: 5000
+        });
+    </script>
+<% end %>

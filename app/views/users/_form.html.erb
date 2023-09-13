@@ -1,0 +1,63 @@
+<%= form_for(@user, url: url) do |f| %>
+  <% if @user.errors.present? %>
+    <div class="errors">
+      <%= raw @user.errors.full_messages.join('<br />') %>
+    </div>
+  <% end %>
+
+  <fieldset>
+    <legend>Contact Information</legend>
+    <div class="field">
+      <%= f.label :name %>
+      <%= f.text_field :name %>
+    </div>
+
+    <div class="field">
+      <%= f.label :phone, 'Phone Number' %>
+      <%= f.phone_field :phone, data: { pattern: '({{999}}) {{999}}-{{9999}}' } %>
+    </div>
+
+    <div class="field">
+      <%= f.label :email %>
+      <%= f.email_field :email %>
+    </div>
+
+    <div class="field">
+      <%= f.label :receive_notification_emails, "Notify of reports via email?" %>
+      <%= f.check_box :receive_notification_emails %>
+    </div>
+  </fieldset>
+
+  <% if current_user.is_admin? %>
+    <fieldset>
+      <div class="field">
+        <%= f.label :client_ids, 'Accessible Clients' %>
+        <%= f.select :client_ids, Client.organized_for_selection, {}, multiple: true %>
+        <% if @user.primary_contact_clients.present? %>
+          <p>
+            <strong>
+              NOTE: this user is the primary contact for
+              <%= @user.primary_contact_clients.map(&:legal_business_name).join(",") %>
+              and access to this client(s) cannot be removed.
+            </strong>
+          </p>
+        <% end %>
+      </div>
+    </fieldset>
+  <% end %>
+  <fieldset>
+    <% if @user.id.present? %>
+      <legend>Change Password</legend>
+    <% else %>
+      <legend>Set Password</legend>
+    <% end %>
+    <div class="field">
+      <%= f.label :password, '' %>
+      <%= f.password_field :password %>
+    </div>
+  </fieldset>
+
+  <div class="field">
+    <%= f.submit %>
+  </div>
+<% end %>

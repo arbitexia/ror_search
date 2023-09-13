@@ -1,0 +1,144 @@
+<%= client_header(@report.created_at.to_date.to_formatted_s(:long), @report.client, request.referrer) %>
+<% if @employees_mask.present? || @vendors_mask.present? %>
+  <script type="text/javascript">window.print()</script>
+<% end %>
+<h3>
+  Report run by:
+  <%= @report.report.source %>
+</h3>
+<br><br>
+
+<h2>Error Message</h2>
+<table class="portal-table" cellspacing="0" cellpadding="0" border="0">
+  <tr></tr>
+  <td>
+    <% if @failed_reason %>
+      <%= @failed_reason %> <br><br>
+      Response from Site : <br><br>
+      <% if @valid_html %>
+        <%= @response_body&.html_safe %>
+      <% else %>
+        <%= @response_body %>
+      <% end %>
+    <% else %>
+      <%= @report_errors.split("\n")[0] %>
+    <% end %>
+  </td>
+</table>
+<br>
+
+<% if @employees_mask.nil? || @employees_mask.count > 0 || @employees.nil? %>
+  <% if @employee_error.present? && @failed_employee.present? %>
+    <h2>Employee</h2>
+    <h3> <%= @employee_error %> </h3>
+    <table class="portal-table" cellspacing="0" cellpadding="0" border="0">
+      <tr>
+        <th>Client Name</th>
+        <th>Employee Name</th>
+        <th>Employee SSN</th>
+        <th>Employee DOB</th>
+      </tr>
+      <tr>
+        <td><%= @failed_employee.client.legal_business_name %></td>
+        <td><%= @failed_employee.first_name %> <%= @failed_employee.last_name %></td>
+        <td><%= @failed_employee.ssn %></td>
+        <td><%= @failed_employee.dob %></td>
+      </tr>
+    </table>
+
+    <div class="button-component flex">
+      <%= button_to 'Edit', edit_client_employee_path(@failed_employee.client.id,
+                                                        @failed_employee.id), class: "update-button", method: :get %>
+      <% if @failed_employee.skip? %>
+        <%= button_to "Cancel Ignore", "javascript:void(0);", class: "skip-button employee-#{@failed_employee.id} skip-cancel-button",'client_id' => @failed_employee.client.id, 'employee_id'=> @failed_employee.id, 'failed_report_id' => @report.id, remote: true %>
+      <% else %>
+      <%= button_to "Ignore", "javascript:void(0);", class: "skip-button employee-#{@failed_employee.id}",'client_id' => @failed_employee.client.id, 'employee_id'=> @failed_employee.id, 'failed_report_id' => @report.id, remote: true %>
+      <% end %>
+    </div>       
+  <% else %>
+  <% end %>
+<% end %>
+
+
+<style type="text/css" media="print">
+  .ignore-print { display: none; }
+  h3 {
+    font-size: 1em;
+    margin: 0;
+  }
+  
+</style>
+<style>
+  body {
+    font-size: 16px !important;
+    background: #ffffff !important;
+  }
+  .flex {
+    display: flex;
+    gap: 10px;
+  }
+  .update-button {
+    background: transparent !important;
+    color: #005fc9 !important;
+    text-decoration: underline;
+    padding: 0 !important;
+    margin: 0 10px;
+  }
+
+  .skip-button {
+    background: transparent !important;
+    color: #005fc9 !important;
+    text-decoration: underline;
+    padding: 0 !important;
+    margin: 0 10px;
+  }
+
+  .skip-cancel-button {
+    display: inline-block;
+  }
+
+  .button-component {
+    display: flex;
+  }  
+</style>
+<script>
+  $(document).ready(function() {
+    $('.skip-button').on('click', function(event) {
+      let message = "Do you want to ignore this employee?";
+      if($(this).hasClass("skip-cancel-button")) {
+        message = "Do you want to restore this employee?";
+      }
+      if(!confirm(message)) {
+        return false;
+      }
+      let skip_button = $(this);
+      const client_id =  skip_button.attr('client_id');
+      const employee_id = skip_button.attr('employee_id');
+      const failed_report_id = skip_button.attr('failed_report_id');
+      const url = '/clients/' + client_id + '/employees/skip';
+      let employee_skip_btn = $(".employee-" + employee_id); 
+      
+      $.ajax({
+        url: url,
+        method: 'POST',
+        dataType: 'json',
+        data: {
+          employee_id: employee_id,
+          failed_report_id: failed_report_id
+        },
+        success: function(data) {
+          if (data.employee_skip_status) {
+            employee_skip_btn.prop("value", "Cancel Ignore");
+            skip_button.addClass("skip-cancel-button");
+          } else {
+            employee_skip_btn.prop("value", "Ignore");
+            skip_button.removeClass("skip-cancel-button");
+          }
+        },
+        error: function(err) {
+          console.log(' error: ', err)
+        }
+      });
+    });
+  });
+</script>

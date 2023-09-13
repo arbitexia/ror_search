@@ -1,0 +1,162 @@
+<header class="portal-header"><%= @client.legal_business_name %></header>
+
+<% if @client.is_facility? && (current_user.is_admin? || current_user.has_access_to_client?(@client.parent)) %>
+    <%= link_to "Back to #{@client.parent.legal_business_name}", client_path(@client.parent) %><br/>
+<% end %>
+
+<% if policy(@client).edit? %>
+  <%= link_to 'Edit Business/Contact Information', edit_client_path(@client) %>
+<% end %>
+
+<%# if @client.is_company? %>
+    <header class="section-header">Facilities</header>
+
+    <% if current_user.is_admin? %>
+      <%= link_to '+ New Facility', new_client_path(parent_id: @client.id) %>
+    <% end %>
+
+    <% if @client.facilities.present? %>
+        <table class="portal-table" cellspacing="0" cellpadding="0" border="0">
+          <tr>
+            <th>Name</th>
+            <th>Actions</th>
+          </tr>
+
+          <% @client.facilities.order('lower(legal_business_name) asc').each do |facility| %>
+              <tr>
+                <td><%= facility.legal_business_name %></td>
+                <td>
+                  <%= link_to 'Manage', client_path(facility), class: :main %>
+                  <% if policy(facility).destroy? %>
+                    <%= link_to 'Delete', client_path(facility), data: { method: :delete, confirm: "Are you sure you wish to delete #{facility.legal_business_name}?" }, class: :delete %>
+                  <% end %>
+                </td>
+              </tr>
+          <% end %>
+        </table>
+    <% end %>
+<%# end %>
+
+<% if current_user.is_admin? || current_user.has_primary_contact_access_to_client?(@client) %>
+    <header class="section-header">Logins</header>
+    <%= render partial: 'users/list', locals: { users: @users } %>
+    <%= link_to 'All Logins', client_users_path(@client), class: :'more-link' %>
+<% end %>
+
+<% if @client.isolved_legal_company_id.present? && @client.isolved_location_id.present? %>
+  <% if @client.external_sync_error.present? %>
+    <p>Client had sync error: <%= @client.external_sync_error %></p>
+  <% end %>
+
+  <% if @client.employees.empty? || @client.has_isolved_employees? %>
+    <%# only allow clients to run follow-up syncs, not first time syncs %>
+    <% if @client.external_sync_progress.present? %>
+      <p>
+        Syncing now.
+        Progress: <%= (@client.external_sync_progress * 100).round(2) %>%.
+        <%= link_to 'Refresh Progress', request.url, class: :main %>
+      </p>
+    <% end %>
+    <% if @client.external_sync_progress.nil? && @client.last_external_sync_at.present? %>
+      <p>Last synced on: <%= @client.last_external_sync_at.strftime("%m/%d/%Y at %I:%M%p GMT %:z") %></p>
+    <% end %>
+    <%= link_to 'Sync from iSolved', url_for(controller: 'clients', action: 'sync_from_isolved', client: @client) %>
+  <% elsif current_user.is_admin? %>
+    <%= link_to 'First-Time Sync from iSolved', url_for(controller: 'clients', action: 'sync_from_isolved', client: @client) %>
+  <% end %>
+  <br />
+  <br />
+<% end %>
+
+<% if @client.central_management_id.present? %>
+  <% if @client.employees.empty? || @client.has_central_management_employees? %>
+    <% if @client.external_sync_error.present? %>
+      <p>Client had sync error: <%= @client.external_sync_error %></p>
+    <% end %>
+    <% if @client.external_sync_progress.present? %>
+      <p>
+        Syncing now.
+        Progress: <%= (@client.external_sync_progress * 100).round(2) %>%.
+        <%= link_to 'Refresh Progress', request.url, class: :main %>
+      </p>
+    <% end %>
+    <% if @client.external_sync_progress.nil? && @client.last_external_sync_at.present? %>
+      <p>Last synced on: <%= @client.last_external_sync_at.strftime("%m/%d/%Y at %I:%M%p GMT %:z") %></p>
+    <% end %>
+
+    <%# only allow clients to run follow-up syncs, not first time syncs %>
+    <%= link_to 'Sync from Central Management', url_for(controller: 'clients', action: 'sync_from_central_management', client: @client) %>
+  <% elsif current_user.is_admin? %>
+    <%= link_to 'First-Time Sync from Central Management', url_for(controller: 'clients', action: 'sync_from_central_management', client: @client) %>
+  <% end %>
+  <br />
+  <br />
+<% end %>
+
+<% if @client.ukg_id.present? %>
+  <% if @client.employees.empty? || @client.has_ukg_employees? %>
+    <% if @client.external_sync_error.present? %>
+      <p>Client had sync error: <%= @client.external_sync_error %></p>
+    <% end %>
+    <% if @client.external_sync_progress.present? %>
+      <p>
+        Syncing now.
+        Progress: <%= (@client.external_sync_progress * 100).round(2) %>%.
+        <%= link_to 'Refresh Progress', request.url, class: :main %>
+      </p>
+    <% end %>
+    <% if @client.external_sync_progress.nil? && @client.last_external_sync_at.present? %>
+      <p>Last synced on: <%= @client.last_external_sync_at.strftime("%m/%d/%Y at %I:%M%p GMT %:z") %></p>
+    <% end %>
+
+    <%# only allow clients to run follow-up syncs, not first time syncs %>
+    <%= link_to 'Sync from UKG', url_for(controller: 'clients', action: 'sync_from_ukg', client: @client) %>
+  <% elsif current_user.is_admin? %>
+    <%= link_to 'First-Time Sync from UKG', url_for(controller: 'clients', action: 'sync_from_ukg', client: @client) %>
+  <% end %>
+  <br />
+  <br />
+<% end %>
+
+<header class="section-header">Employees</header>
+<%= render partial: 'employees/list', locals: { employees: @employees } %>
+<%= link_to 'All Employees', client_employees_path(@client), class: :'more-link' %>
+
+<header class="section-header">Vendors</header>
+<%= render partial: 'vendors/list', locals: { vendors: @vendors } %>
+<%= link_to 'All Vendors', client_vendors_path(@client), class: :'more-link' %>
+
+<% if @batch_uploads.present? %>
+  <header class="section-header">Batch Uploads</header>
+  <%= render partial: 'batch_uploads/list', locals: { batch_uploads: @batch_uploads } %>
+  <%= link_to 'All Batch Uploads', client_batch_uploads_path(@client), class: :'more-link' %>
+<% end %>
+
+<header class="section-header">Reports</header>
+<%= render partial: 'reports/list', locals: { reports: @reports } %>
+<%= link_to 'All Reports', client_reports_path(@client), class: :'more-link' %>
+
+<% if current_user.is_admin? %>
+  <%= render partial: "enabled_searchers", locals: { client: @client }%>
+<% end %>
+
+<% if policy(@client).post_note? %>
+  <header class="section-header">Administrator Notes</header>
+  <hr />
+  <% @client.notes.each do |note| %>
+      <p>
+        <strong><%= note.user.name %></strong>
+        <br />
+        <span style="font-size: 0.8em"><%= note.created_at.strftime('%m/%d/%Y') %> at <%= note.created_at.strftime('%H:%M:%S') %></span>
+        <pre><%= note.text %></pre>
+      </p>
+      <hr />
+  <% end %>
+
+  <br />
+  <%= form_tag(post_note_client_url(@client)) do |f| %>
+      <%= text_area_tag :text, '', style: 'width: 80%; height: 150px; font-size: 16px' %>
+      <br/>
+      <%= submit_tag 'Add Note' %>
+  <% end %>
+<% end %>

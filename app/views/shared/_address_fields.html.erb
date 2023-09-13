@@ -1,0 +1,10 @@
+<div class="field <%= address_type %>">
+  <%= f.label :"#{address_type}_address", "#{address_type.capitalize} Address" %>
+  <%= f.text_field :"#{address_type}_address" %>
+</div>
+<div class="field <%= address_type %>">
+  <%= f.label :"#{address_type}_city", "#{address_type.capitalize} City/State/ZIP" %>
+  <%= f.text_field :"#{address_type}_city", placeholder: 'City', size: 10 %>
+  <%= f.select :"#{address_type}_state", [['State', nil]] + us_states %>
+  <%= f.text_field :"#{address_type}_zip", placeholder: 'ZIP', size: 5 %>
+</div>

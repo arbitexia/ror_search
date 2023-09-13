@@ -1,0 +1,12 @@
+<% content_for(:title) do %>
+    Sanction Search: Portal
+<% end %>
+<% content_for(:content) do %>
+    <section id="portal-wrap">
+      <p class="flash notice"><%= notice %></p>
+      <p class="flash alert"><%= alert %></p>
+      <%= content_for(:content) ? yield(:content) : yield %>
+    </section>
+<% end %>
+
+<% parent_layout 'application' %>

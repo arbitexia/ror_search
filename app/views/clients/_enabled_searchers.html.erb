@@ -1,0 +1,30 @@
+<header class="section-header">Enabled searchers</header>
+<hr />
+<% client.client_searchers.order("searcher asc").each do |client_searcher| %>
+  <% unless client_searcher.skip? %>
+    <div style="display: block">
+      <span><%= ClientSearcher.reverse_searcher_map[client_searcher.searcher] %></span>
+      <%= check_box_tag client_searcher.searcher.to_s, true, client_searcher.enabled,
+          class: "client_searcher_checkbox", 'attr-id' => client_searcher.id%>
+    </div>
+  <% end %>
+<% end %>
+
+<script>
+  $(document).ready(function() {
+    $('.client_searcher_checkbox').on('click', function(event) {
+      const isChecked = event.target.checked;
+      const clientSearcherId =  $(this).attr('attr-id');
+      const url = '/client_searchers/' + clientSearcherId+ '/toggle_enabled';
+
+      $.ajax({
+        url: url,
+        method: 'PATCH',
+        dataType: 'json',
+        data: {
+          authenticity_token: $('meta[name="csrf-token"]').attr('content')
+        }
+      });
+    });
+  });
+</script>

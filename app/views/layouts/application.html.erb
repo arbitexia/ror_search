@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title><%= content_for?(:title) ? yield(:title) : 'Sanction Search' %></title>
+  <%= csrf_meta_tags %>
+
+  <%= content_for?(:meta) ? yield(:meta) : nil %>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="//fonts.googleapis.com/css?family=Open+Sans:400,600,700&amp;subset=latin-ext" rel="stylesheet"/>
+  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+</head>
+
+<body>
+
+<% if user_masquerade? %>
+  <header class="title-bar" style="background-color: antiquewhite">
+    <div class="link"><p class="pt-0"> Masqueraded as: <%= current_user.name %></a></div>
+    <div class="link">
+      <%= link_to "Cancel masquerade", back_masquerade_path(current_user), style: "padding-top: 0" %>
+    </div>
+  </header>
+<% end %>
+<header class="title-bar">
+  <a href="/splash" class="logo"></a>
+
+  <% if content_for?(:nav) %>
+    <%= yield :nav %>
+  <% else %>
+    <% if user_signed_in? && current_user.is_admin? %>
+      <div class="link"><a class="person emphasized" href="<%= admins_path %>">Administrators</a></div>
+      <div class="link"><a class="person emphasized" href="<%= clients_path %>">Clients</a></div>
+      <div class="link"><a class="person emphasized" href="<%= base_users_path %>">All users</a></div>
+      <div class="link"><a class="reports emphasized" href="<%= failed_reports_path %>">Failed Jobs</a></div>
+    <% end %>
+    <% if user_signed_in? && current_user.clients.count > 1 %>
+      <div class="link"><a class="person emphasized" href="<%= clients_path %>">Clients</a></div>
+    <% end %>
+    <% if @client&.id.present? %>
+      <% if current_user.is_admin? || current_user == @client.primary_contact %>
+        <div class="link"><%= link_to 'Edit Info', edit_client_path(@client), class: 'wrench' %></div>
+        <div class="link"><%= link_to 'Logins', client_users_path(@client), class: 'person' %></div>
+      <% else %>
+        <div class="link"><%= link_to 'Edit Info', edit_client_user_path(@client, current_user), class: 'person' %></div>
+      <% end %>
+      <div class="link"><%= link_to 'Employees', client_employees_path(@client), class: 'person' %></div>
+      <div class="link"><%= link_to 'Vendors', client_vendors_path(@client), class: 'person' %></div>
+      <div class="link"><%= link_to 'Reports', client_reports_path(@client), class: 'reports' %></div>
+    <% elsif user_signed_in? && current_user.clients.include?(@client) %>
+      <% if current_user.is_admin? || current_user == @client.primary_contact %>
+        <div class="link"><%= link_to 'Logins', client_users_path(@client), class: 'person' %></div>
+      <% end %>
+      <div class="link"><%= link_to 'Employees', client_employees_path(@client), class: 'person' %></div>
+      <div class="link"><%= link_to 'Vendors', client_vendors_path(@client), class: 'person' %></div>
+      <div class="link"><%= link_to 'Reports', client_reports_path(@client), class: 'reports' %></div>
+      <div class="link"><%= link_to 'Business Info', edit_client_path(@client), class: 'wrench' %></div>
+    <% end %>
+    <% if user_signed_in? %>
+      </div>
+      <% if current_user.is_admin? %>
+       <div class="settings-parent">      
+          <div class="link"><a class="settings-menu">Settings</a></div>
+          <div class="btn-parent">        
+            <a class="btn-settings" href="<%= settings_path %>">settings</a>
+            <a class="logout btn-logout" href="<%= destroy_user_session_path %>" data-method="delete">logout</a>
+          </div>
+        </div>
+      <% else %>
+        <div class="link"><a class="logout" href="<%= destroy_user_session_path %>" data-method="delete">Logout</a>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="link"><%= link_to 'Home', root_path, class: 'wrench' %></div>
+    <% end %>
+  <% end %>
+</header>
+
+<% if content_for?(:content) %>
+  <%= yield(:content) %>
+<% else %>
+  <section id="outer-wrap">
+    <p class="notice"><%= notice %></p>
+    <p class="alert"><%= alert %></p>
+    <%= yield %>
+  </section>
+<% end %>
+
+</body>
+</html>
+
+<script>
+  $(document).ready(function() {
+    var toggle_enabled = false;
+    $(document).on("click", function(event) {
+      var target = $(event.target);
+      if (!target.closest(".settings-parent").length) {
+        $('.btn-parent').css("display", "none");
+        $('.settings-parent').css("margin-top", "0px");
+        toggle_enabled = false
+      }
+    });
+
+    $('.settings-parent').on('click', function(event) {
+      if(toggle_enabled == false) {
+        toggle_enabled = true
+        $('.btn-parent').css("display", "flex");
+        $('.settings-parent').css("margin-top", "85px");
+      } else {
+        toggle_enabled = false
+        $('.btn-parent').css("display", "none");
+        $('.settings-parent').css("margin-top", "0px");
+      }      
+    });
+  });
+</script>
+
+<style>
+  .settings-menu {
+    filter: hue-rotate(135deg) brightness(90%);
+  }
+  .settings-parent {
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+    /* margin-top: 85px; */
+  }
+  .settings-parent:hover {
+    cursor: pointer;
+  }
+  .btn-parent { 
+    /* display: flex; */
+    display: none;
+    flex-direction: column;
+  }
+  .btn-settings, .btn-logout { 
+    text-align: center;
+    padding: 10px;
+    border: solid 1px #005fc9;
+    color: #005fc9;
+    font-weight: 600;
+    text-decoration: none;
+    filter: hue-rotate(135deg) brightness(90%);
+  }
+  .btn-settings {
+    border-bottom: none;
+  }
+</style>

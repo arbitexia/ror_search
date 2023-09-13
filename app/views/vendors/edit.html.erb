@@ -1,0 +1,5 @@
+<%= client_header('Edit Vendor', @client, request.referrer) %>
+
+<%= render partial: 'vendors/form', locals: { url: client_vendor_url(@vendor.client, @vendor) } %>
+
+<%= link_to 'Remove Vendor Record', client_vendor_url(@vendor.client, @vendor, page: params[:page]), class: 'delete-link', data: { method: :delete, confirm: "Are you sure you would like to remove #{@vendor.name}?" } %>

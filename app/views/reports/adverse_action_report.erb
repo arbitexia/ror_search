@@ -1,0 +1,26 @@
+<%= @client.legal_business_name %><br />
+<%= @client.mailing_address %><br />
+<%= @client.mailing_city %>, <%= @client.mailing_state %> <%= @client.mailing_zip %><br />
+<br />
+<br />
+<%= Date.today.to_formatted_s(:long) %><br />
+Dear <%= @applicant_name %>,<br />
+<br />
+We regret to inform you that based on our current hiring criteria, we are unable to consider you further for an employment opportunity with our organization. This decision was made in part based on information we received in a consumer report provided to us, at our request, by Sanction Search.<br />
+<br />
+Sanction Search does not make any employment decisions on our behalf and will not be able to provide you with any information relating to our decision. In accordance with the Fair Credit Reporting Act, you have previously received a copy of this information and a copy of your rights under the Act. You have the right to obtain an additional free copy of the report from Sanction Search within 60 days of your receipt of this letter by sending the following information: (1) a photocopy of your driver’s license, state-issued identification card or social security card, (2) your current mailing address (3) your telephone number, and (4) your social security number to the address listed below. This information is necessary prior to Sanction Search processing your request. You also have the right to dispute the accuracy or completeness of any information contained in the consumer report by contacting Sanction Search. You may view their consumer dispute procedure by going to www.Sanction Search.com and visiting their consumer services page. All correspondence must be directed to:<br />
+<br />
+Attn: Consumer Relations<br />
+Sanction Search<br />
+4705 Palmetto Rd #4<br />
+Benton, LA 71006<br />
+<br />
+866.998.7251 toll-free<br />
+<br />
+Thank you for your interest in employment within our organization.<br />
+<br />
+Regards,<br />
+<br />
+<%= @client.legal_business_name %><br />
+
+<script>window.print();</script>

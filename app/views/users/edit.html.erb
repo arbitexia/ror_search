@@ -1,0 +1,3 @@
+<%= client_header('Edit Login', @client, request.referrer) %>
+
+<%= render partial: 'form', locals: { url: client_user_url(@client, @user) } %>

@@ -1,0 +1,41 @@
+<%= form_for(@user, url: url) do |f| %>
+    <% if @user.errors.present? %>
+        <div class="errors">
+          <%= raw @user.errors.full_messages.join('<br />') %>
+        </div>
+    <% end %>
+
+    <fieldset>
+      <legend>Contact Information</legend>
+      <div class="field">
+        <%= f.label :name %>
+        <%= f.text_field :name %>
+      </div>
+
+      <div class="field">
+        <%= f.label :phone, 'Phone Number' %>
+        <%= f.phone_field :phone, data: { pattern: '({{999}}) {{999}}-{{9999}}' } %>
+      </div>
+
+      <div class="field">
+        <%= f.label :email %>
+        <%= f.email_field :email %>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <% if @user.id.present? %>
+          <legend>Change Password</legend>
+      <% else %>
+          <legend>Set Password</legend>
+      <% end %>
+      <div class="field">
+        <%= f.label :password, '' %>
+        <%= f.password_field :password %>
+      </div>
+    </fieldset>
+
+    <div class="field">
+      <%= f.submit %>
+    </div>
+<% end %>

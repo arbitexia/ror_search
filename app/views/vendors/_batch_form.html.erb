@@ -1,0 +1,30 @@
+<%= form_tag create_batch_client_vendors_url(@client), multipart: true do %>
+  <% if @error.present? %>
+    <div class="flash error"><%= @error %></div>
+  <% end %>
+
+  <ul class="info">
+    <li>To add multiple vendors in a single batch, please download and fill
+      out <%= link_to 'this form', '/vendors_form.csv' %> in Excel. When you are done entering information, upload
+      the form here.
+    </li>
+    <li>Please do not remove the first row, containing the headings.</li>
+    <li>Please make sure you save the file before uploading it here.</li>
+  </ul>
+
+  <h3>Please upload the filled-in form using the button below.</h3>
+  <div class="field">
+    <%= file_field_tag :batch_file %>
+  </div>
+
+  <br/>
+
+  <div class="field">
+    <%= label_tag :run_report_now, 'Run initial report?' %>
+    <%= check_box_tag :run_report_now %>
+  </div>
+
+  <div class="field">
+    <%= submit_tag 'Add Vendors' %>
+  </div>
+<% end %>

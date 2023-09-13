@@ -1,0 +1,20 @@
+<p>Shawn,</p>
+
+<p><%= @name %>, a prospective client, has requested more information about signing up on Sanction Search.</p>
+
+<p>
+  <% if @company_name.present? %>
+      Their company is called "<%= @company_name %>".
+  <% end %>
+  <% if @employees.present? %>
+      They estimate they should have about <%= @employees %> employees.
+  <% end %>
+</p>
+
+<% if @email.present? %>
+    <p>You can follow-up with them by email at: <%= mail_to @email %>.</p>
+<% end %>
+
+<% if @phone.present? %>
+    <p>You can reach them by phone at <%= link_to @phone, "tel:#{@phone}" %>.</p>
+<% end %>

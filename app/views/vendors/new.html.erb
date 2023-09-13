@@ -1,0 +1,3 @@
+<%= client_header('New Vendor', @client, request.referrer) %>
+
+<%= render partial: 'vendors/form', locals: { url: client_vendors_url(@vendor.client, @vendor) } %>

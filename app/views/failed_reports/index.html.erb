@@ -1,0 +1,172 @@
+<p id="notice"><%= notice %></p>
+<%= form_tag "", method: :get do %>
+  <div class="status-filter">
+    <div>
+      <p class="reports-icon"></p>
+      <p>Success Jobs - Total</p>
+      <p><%= @total_success_count %></p>
+    </div>
+    <div>
+      <p class="reports-icon"></p>
+      <p>Failed Jobs - Total</p>
+      <p><%= @total_failed_count %></p>
+    </div>
+    <div>
+      <p class="reports-icon"></p>
+      <p>Success Jobs - <%= params[:date_filter] ? @date_filter[params[:date_filter].to_i-1] : "Today" %></p>
+      <p><%= @today_success_count %></p>
+    </div>
+    <div>
+      <p class="reports-icon"></p>
+      <p>Failed Jobs - <%= params[:date_filter] ? @date_filter[params[:date_filter].to_i-1] : "Today" %></p>
+      <p><%= @today_failed_count %></p>
+    </div>
+  </div>
+
+  <div class="flex gap-2">
+    <%= text_field_tag :search, params[:search], placeholder: "Enter search keyword...", class: "w-300" %>
+    <%= select_tag :client_id, options_for_select(@clients, params[:client_id]), prompt: "Select a Company" %>
+  </div>
+  <div class="flex gap-4">
+    <div class="flex gap-2">
+      <%= date_field_tag 'start_date', params[:start_date] %>
+      <%= date_field_tag 'end_date', params[:end_date] %>
+    </div>
+    <div class="flex date-filter justify-between">
+      <%= select_tag :date_filter, options_for_select([["This Month", 1], ["Last Week", 2], ["This Week", 3], ["Today", 4]], params[:date_filter]), prompt: "Select a Duration" %>
+
+      <div>
+        <%= radio_button_tag 'date_filter', 0, false, class: "check-box" %>
+      </div>
+    </div>
+    <%= submit_tag "Search", style: "padding: 4px 12px 4px 12px;" %>
+    <%= link_to 'Clear', failed_reports_path, class: "clear-button" %>
+  </div>
+<% end %>
+
+<table class="portal-table" cellspacing="0" cellpadding="0" border="0">
+    <tr>
+      <th>Report ID</th>
+      <th>Client Name</th>
+      <th>Error Message</th>
+      <th>Date</th>
+      <th>Actions</th>
+    </tr>
+    <% @failed_reports.each do |failed_report| %>
+      <tr>
+        <td><%= failed_report.report_id %></td>
+        <td><%= link_to "#{failed_report.client.legal_business_name if failed_report.client.legal_business_name.present?}", client_path(failed_report.client.id), class: "update-button", method: :get, target: :_blank %></td>
+        <td><p><% text_lines = failed_report.error.split("\n")[0].split("FailedReason: ") %><%= text_lines[1] || text_lines[0] %></p></td>
+        <td><div class="flex"><%= failed_report.created_at.strftime('%a, %b %e, %Y at %I:%M%p GMT %:z') %></div></td>
+        <td>
+          <div class="flex min-120">
+            <%= link_to 'Show', failed_report_path(failed_report) %>
+            <% if failed_report.report.status === 'pending' %>
+              <%= link_to 'Re-run', rerun_client_report_path(failed_report.client, failed_report.report), class: :main %>
+            <% end %>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+</table>
+
+<%= will_paginate @failed_reports %>
+
+<style type="text/css">
+  td p {
+    /*max-height: 24px;*/
+    /*overflow: hidden;*/
+    max-width: 400px;
+    word-break: break-all;
+  }
+  div.flex {
+    display: flex;
+    align-items: center;
+  }
+  .flex.gap-2 {
+    gap: 0.5rem;
+  }
+  .flex.gap-4 {
+    gap: 1rem;
+  }
+  .min-120 {
+    min-width: 120px;
+  }
+  .flex.justify-between {
+    justify-content: space-between;
+    align-items: center;
+  }
+  div.status-filter {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+  div.date-filter input,
+  div.status-filter input {
+    display: none;
+  }
+  div.date-filter {
+    gap: 5px;
+  }
+  div.date-filter label {
+    border: 1px solid #BBBBBB;
+    border-radius: 3px;
+    padding: 4px 8px;
+    cursor: pointer;
+  }
+  div.date-filter input:checked + label {
+    /*background: #f2f2f2;*/
+    background: #0099ff;
+    color: #fff;
+  }
+  div.date-filter div:last-child input:checked + label {
+    background: #fff;
+    color: #000;
+  }
+  div.status-filter div {
+    width: 25%;
+  }
+  div.status-filter div {
+    border-radius: 5px;
+    padding: 15px 20px;
+    color: white;
+    display: block;
+    cursor: pointer;
+  }
+  div.status-filter p {
+    margin: 10px 0;
+  }
+  div.status-filter .reports-icon {
+    width: 40px;
+    height: 40px;
+    filter: brightness(0) invert(1);
+  }
+  div.status-filter div:first-child {
+    background: #428bca;
+  }
+  div.status-filter div:nth-child(2) {
+    background: #ff99cc;
+  }
+  div.status-filter div:nth-child(3) {
+    background: #0099ff;
+  }
+  div.status-filter div:nth-child(4) {
+    background: #B00100;
+  }
+  .clear-button {
+    text-decoration: none;
+    background-color: #005fc9;
+    border-radius: 16px;
+    margin: 1em 1px;
+    font-size: 1em;
+    color: white !important;
+    border-style: none;
+    padding: 4px 12px 4px 12px;
+    cursor: pointer;
+  }
+    .w-300 {
+      width: 300px;
+    }
+</style>

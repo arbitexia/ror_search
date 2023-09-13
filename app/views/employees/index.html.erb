@@ -1,0 +1,4 @@
+<%= client_header('Employee Management', @client, request.referrer) %>
+
+<%= render partial: 'list', locals: { employees: @employees } %>
+<%= will_paginate(@employees) %>

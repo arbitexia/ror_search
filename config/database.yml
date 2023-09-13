@@ -1,0 +1,33 @@
+# SQLite version 3.x
+#   gem install sqlite3
+#
+#   Ensure the SQLite 3 gem is defined in your Gemfile
+#   gem 'sqlite3'
+#
+default: &default
+  adapter: postgresql
+  pool: 100
+  timeout: 5000
+  database: sanction_search
+  username: sanction_search
+
+development:
+  <<: *default
+  host: localhost
+  password: sanction_search
+  port: 5432
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test:
+  <<: *default
+  database: sanction_search_test
+  password: sanction_search
+
+production:
+  <<: *default
+  adapter: postgresql
+  password: '{N%C6Tk`):kpau,E'
+  host: <%= `hostname` == "ip-172-31-88-225\n" ? "18.220.29.50" : "172.31.27.237" %>
+  port: 5432

@@ -1,0 +1,4 @@
+<%= client_header('Batch Uploads', @client, request.referrer) %>
+
+<%= render partial: 'list', locals: { batch_uploads: @batch_uploads } %>
+<%= will_paginate @batch_uploads %>

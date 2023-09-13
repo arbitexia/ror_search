@@ -1,0 +1,3 @@
+<%= client_header('New Employee', @client, request.referrer) %>
+
+<%= render partial: 'employees/form', locals: { url: client_employees_url(@employee.client, @employee) } %>

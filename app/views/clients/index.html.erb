@@ -1,0 +1,33 @@
+<header class="section-header">Companies</header>
+
+<% if policy(Client).new? %>
+  <%= link_to '+ Add Company', new_client_path %>
+<% end %>
+
+<%= form_tag "", method: :get do %>
+  <%= text_field_tag :search, params[:search] %>
+  <%= submit_tag "Search", style: "padding: 4px 12px 4px 12px;" %>
+<% end %>
+
+<table class="portal-table" cellspacing="0" cellpadding="0" border="0">
+  <tr>
+    <th>Name</th>
+    <th>Actions</th>
+  </tr>
+
+  <% @clients.each do |client| %>
+      <tr>
+        <td><%= client.legal_business_name %></td>
+        <td>
+          <% if policy(client).show? %>
+            <%= link_to 'Manage', client_path(client), class: :main %>
+          <% end %>
+          <% if policy(client).destroy? %>
+            <%= link_to 'Delete', client_path(client), data: { method: :delete, confirm: "Are you sure you wish to delete #{client.legal_business_name}?" }, class: :delete %>
+          <% end %>
+        </td>
+      </tr>
+  <% end %>
+</table>
+
+<%= will_paginate @clients %>

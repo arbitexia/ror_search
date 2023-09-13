@@ -1,0 +1,59 @@
+oig_refresh:
+  cron: 0 0 * * *
+  class: OIGRefreshJob
+  queue: default
+  active_job: true
+
+dhh_refresh:
+  cron: 0 0 * * *
+  class: DHHRefreshJob
+  queue: default
+  active_job: true
+
+sam_refresh:
+  cron: 30 16 * * *
+  class: SAMRefreshJob
+  queue: default
+  active_job: true
+
+dhsar_refresh:
+  cron: 30 5 * * *
+  class: DHSARRefreshJob
+  queue: default
+  active_job: true
+
+msmedicaid_refresh:
+  cron: 30 5 * * *
+  class: MSMedicaidRefreshJob
+  queue: default
+  active_job: true
+
+txoig_refresh:
+  cron: 30 5 * * *
+  class: TXOIGRefreshJob
+  queue: default
+  active_job: true
+
+ofac_refresh:
+  cron: 30 5 * * *
+  class: OFACRefreshJob
+  queue: default
+  active_job: true
+
+monthly_reports:
+  cron: "*/5 * * * *"
+  class: MonthlyReportJob
+  queue: default
+  active_job: true
+
+pa_medicheck_refresh:
+  cron: 0 4 * * *
+  class: PAMedicheckRefreshJob
+  queue: default
+  active_job: true
+
+la_adra_refresh_job:
+  cron: 30 5 * * *
+  class: LaAdraRefreshJob
+  queue: default
+  active_job: true

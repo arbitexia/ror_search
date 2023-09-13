@@ -1,0 +1,50 @@
+<table class="portal-table" cellspacing="0" cellpadding="0" border="0">
+  <tr>
+    <th>Date</th>
+    <th>Status</th>
+    <th></th>
+  </tr>
+
+  <% @batch_uploads.each do |batch_upload| %>
+      <tr>
+        <td>
+          <%= batch_upload.created_at.strftime('%a, %b %e') %>
+        </td>
+        <td>
+          <% if batch_upload.error.present? %>
+            <% if batch_upload.progress == 1.0 && batch_upload.imported_record_count.present? %>
+              Imported <%= pluralize batch_upload.imported_record_count, batch_upload.record_type %>, with some errors.
+              <% if current_user.is_admin? %>
+                <br />
+                <pre>
+                  <%= batch_upload.error %>
+                </pre>
+              <% else %>
+                Please contact an admin for details.
+              <% end %>
+            <% else %>
+              Failed to Import
+              <!--
+<%= batch_upload.error %>
+              -->
+            <% end %>
+          <% elsif batch_upload.progress.present? %>
+            <% if batch_upload.progress == 1.0 && batch_upload.imported_record_count.present? %>
+              Imported <%= pluralize batch_upload.imported_record_count, batch_upload.record_type %>
+            <% else %>
+              Importing
+              &bull;
+              <%= number_to_percentage batch_upload.progress * 100, precision: 2 %>
+            <% end %>
+          <% else %>
+              Queued
+          <% end %>
+        </td>
+        <td>
+          <% if batch_upload.imported_record_count.nil? %>
+            <%= link_to 'Refresh', client_batch_uploads_path(@client), class: :main %>
+          <% end %>
+        </td>
+      </tr>
+  <% end %>
+</table>

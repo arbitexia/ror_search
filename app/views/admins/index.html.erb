@@ -1,0 +1,22 @@
+<header class="section-header">Administrative Users</header>
+
+<%= link_to '+ Add Administrative User', new_admin_path %>
+
+<table class="portal-table" cellspacing="0" cellpadding="0" border="0">
+  <tr>
+    <th>Name</th>
+    <th>Actions</th>
+  </tr>
+
+  <% @users.each do |user| %>
+      <tr>
+        <td><%= user.name %></td>
+        <td>
+          <%= link_to 'Edit', edit_admin_path(user), class: :main %>
+          <%= link_to 'Delete', admin_path(user), data: { method: :delete, confirm: "Are you sure you wish to delete #{user.name}?" }, class: :delete %>
+        </td>
+      </tr>
+  <% end %>
+</table>
+
+<%= will_paginate @users %>

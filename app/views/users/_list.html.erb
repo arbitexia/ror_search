@@ -1,0 +1,32 @@
+<%= link_to '+ Add Login', new_client_user_path(@client) %>
+
+<table class="portal-table" cellspacing="0" cellpadding="0" border="0">
+  <tr>
+    <th>Name</th>
+    <th>Primary?</th>
+    <th>Actions</th>
+  </tr>
+
+  <% @users.each do |user| %>
+      <tr>
+        <td><%= user.name %></td>
+        <td>
+          <% if user == @client.primary_contact %>
+              Yes
+          <% else %>
+              No
+          <% end %>
+        </td>
+        <td>
+          <% if current_user.is_admin? %>
+            <%= link_to "Masquerade", masquerade_path(user) %>
+          <% end %>
+          <%= link_to 'Edit', edit_client_user_path(@client, user), class: :main %>
+          <% if user != @client.primary_contact %>
+              <%= link_to 'Make Primary', make_primary_client_user_path(@client, user) %>
+              <%= link_to 'Delete', client_user_path(@client, user), data: { method: :delete, confirm: "Are you sure you wish to delete #{user.name}?" }, class: :delete %>
+          <% end %>
+        </td>
+      </tr>
+  <% end %>
+</table>

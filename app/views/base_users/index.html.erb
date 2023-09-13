@@ -1,0 +1,38 @@
+<%= form_tag "", method: :get do %>
+  <%= text_field_tag :search, params[:search] %>
+  <%= submit_tag "Search", style: "padding: 4px 12px 4px 12px;" %>
+<% end %>
+
+<table class="portal-table" cellspacing="0" cellpadding="0" border="0">
+  <tr>
+    <th>Name</th>
+    <th>Phone</th>
+    <th>Email</th>
+    <th>Clients</th>
+    <th>Access Data</th>
+    <th>Actions</th>
+  </tr>
+
+  <% @users.each do |user| %>
+      <tr>
+        <td><%= user.name %></td>
+        <td><%= user.phone %></td>
+        <td><%= user.email %></td>
+        <td><%= user.clients.map(&:to_s).join(",") %></td>
+        <td style="font-size: 13px">
+          <p style="margin: 0"><%= user.current_sign_in_ip %></p>
+          <span >
+          <%= user.current_sign_in_at ? user.current_sign_in_at.strftime('%m/%d/%Y %H:%M') : '' %>
+          </span>
+        </td>
+        <td>
+          <% if current_user.is_admin? %>
+            <%= link_to "Masquerade", masquerade_path(user) %>
+            <%= link_to 'Edit', edit_base_user_path(user), class: :main %>
+          <% end %>
+        </td>
+      </tr>
+  <% end %>
+</table>
+
+<%= will_paginate @users %>

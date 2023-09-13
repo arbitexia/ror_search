@@ -1,0 +1,4 @@
+<%= client_header('Reports', @client, client_path(@client)) %>
+
+<%= render partial: 'list', locals: { reports: @reports } %>
+<%= will_paginate @reports %>

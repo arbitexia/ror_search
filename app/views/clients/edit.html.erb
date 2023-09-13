@@ -1,0 +1,12 @@
+<% if @client.users.any? {|user| user.is_suspended?} %>
+  <p>
+    <%= @client.legal_business_name %> is suspended.
+
+    <% if current_user.is_admin? %>
+      <%= link_to 'Unsuspend', action: :toggle_suspended %>
+    <% end %>
+  </p>
+<% else %>
+  <%= link_to "Back to Overview", client_path(@client) %>
+  <%= render partial: 'clients/form', locals: { url: client_path(@client) } %>
+<% end %>

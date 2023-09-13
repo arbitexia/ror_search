@@ -1,0 +1,28 @@
+<header class="section-header">Skipped searchers (For all Clients)</header>
+<hr />
+<% client.client_searchers.order("searcher asc").each do |client_searcher| %>
+  <div style="display: block">
+    <span><%= ClientSearcher.reverse_searcher_map[client_searcher.searcher] %></span>
+    <%= check_box_tag client_searcher.searcher.to_s, true, client_searcher.skip,
+        class: "all_client_searcher_checkbox", 'attr-id' => client_searcher.searcher%>
+  </div>
+<% end %>
+
+<script>
+  $(document).ready(function() {
+    $('.all_client_searcher_checkbox').on('click', function(event) {
+      const isChecked = event.target.checked;
+      const clientSearcherId =  $(this).attr('attr-id');
+      const url = '/client_searchers/' + clientSearcherId+ '/toggle_enabled_for_all_clients';
+
+      $.ajax({
+        url: url,
+        method: 'PATCH',
+        dataType: 'json',
+        data: {
+          authenticity_token: $('meta[name="csrf-token"]').attr('content')
+        }
+      });
+    });
+  });
+</script>

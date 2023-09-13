@@ -1,0 +1,171 @@
+<%= form_for(@client, url: url) do |f| %>
+    <% if @errors.present? %>
+        <div class="errors">
+          <%= raw @errors.full_messages.join('<br />') %>
+        </div>
+    <% end %>
+
+    <% if current_user.is_admin? %>
+      <fieldset>
+        <legend>Hierarchy</legend>
+        <div class="field client_type_field">
+          <%= f.label :client_type, 'Type' %>
+          <%= f.radio_button :client_type, :company %> Company
+          <%= f.radio_button :client_type, :facility %> Facility
+        </div>
+        <div class="field parent-container">
+          <%= f.label :parent_id, 'Parent Company' %>
+          <%# f.select :parent_id, Client.companies.where.not(id: @client.id).collect {|client| [client.legal_business_name, client.id]}, include_blank: true %>
+          <%= f.select :parent_id, Client.organized_for_selection, include_blank: true %>
+        </div>
+        <div class="field">
+          <%= f.label :max_employees, 'Maximum # of Employees' %>
+          <%= f.number_field :max_employees %>
+        </div>
+        <div class="field company-only">
+          <%= f.label :monthly_report_day, raw("Day of Month<br/>(for Automatic Reports)") %>
+          <%= f.select :monthly_report_day, (1..28).to_a %>
+        </div>
+        <div class="field company-only">
+          <%= f.label :next_report_at, raw("Next Scheduled Report") %>
+          <%= f.datetime_local_field :next_report_at %>
+        </div>
+        <div class="field">
+          <%= f.label :deactivated, raw("Deactivated?<br/>(reports will no longer run)") %>
+          <%= f.check_box :deactivated %>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>iSolved Connection</legend>
+
+        <div class="field company-only">
+          <%= f.label :isolved_endpoint, 'iSolved Endpoint' %>
+          <%= f.select :isolved_endpoint, IsolvedSearcher.ENDPOINT_OPTIONS, {}, style: 'width: 200px' %>
+        </div>
+
+        <div class="field company-only">
+          <%= f.label :isolved_client_id, 'iSolved Client' %>
+          <% options = @client.isolved_client_id.present? && @client.isolved_client_name.present? ? [[@client.isolved_client_name, @client.isolved_client_id]] : [] %>
+          <%= f.select :isolved_client_id, options, {}, style: 'width: 200px' %>
+          <%= f.text_field :isolved_client_name, style: 'display: none' %>
+        </div>
+
+        <div class="field facility-only">
+          <%= f.label :isolved_legal_company_id, 'iSolved Legal Company' %>
+          <% options = @client.isolved_legal_company_id.present? && @client.isolved_legal_company_name.present? ? [[@client.isolved_legal_company_name, @client.isolved_legal_company_id]] : [] %>
+          <%= f.select :isolved_legal_company_id, options, {}, style: 'width: 200px' %>
+          <%= f.text_field :isolved_legal_company_name, style: 'display: none' %>
+        </div>
+
+        <div class="field facility-only">
+          <%= f.label :isolved_location_id, 'iSolved Location' %>
+          <% options = @client.isolved_location_id.present? && @client.isolved_location_name.present? ? [[@client.isolved_location_name, @client.isolved_location_id]] : [] %>
+          <%= f.select :isolved_location_id, options, {}, style: 'width: 200px' %>
+          <%= f.text_field :isolved_location_name, style: 'display: none' %>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Central Management Connection</legend>
+
+        <div class="field">
+          <%= f.label :central_management_id, 'Central Management Client' %>
+          <%= f.select :central_management_id, CentralManagementLoader.client_select_options, {}, style: 'width: 200px' %>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>UKG Connection</legend>
+
+        <div class="field">
+          <%= f.label :ukg_id, 'UKG Client' %>
+          <%= f.select :ukg_id, UkgLoader.client_select_options, {}, style: 'width: 200px' %>
+        </div>
+      </fieldset>
+    <% end %>
+
+    <fieldset>
+      <legend>Business Information</legend>
+      <div class="field">
+        <%= f.label :legal_business_name, 'Legal Business Name' %>
+        <%= f.text_field :legal_business_name %>
+      </div>
+      <%= render partial: 'shared/address_fields', locals: { address_type: 'mailing', f: f } %>
+      <%= render partial: 'shared/address_fields', locals: { address_type: 'physical', f: f } %>
+      <div class="field">
+        <%= f.label :business_type %>
+        <%= f.select :business_type, Client::BUSINESS_TYPES %>
+      </div>
+      <div class="field">
+        <%= f.label :state_of_incorporation %>
+        <%= f.select :state_of_incorporation, us_states %>
+      </div>
+      <div class="field">
+        <%= f.label :tax_id_number, 'Tax ID Number' %>
+        <%= f.text_field :tax_id_number, data: { pattern: '{{999999999}}' } %>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Primary Contact</legend>
+      <div class="field">
+        <%= f.label :primary_contact_name, 'Full Name' %>
+        <%= f.text_field :primary_contact_name %>
+      </div>
+      <div class="field">
+        <%= f.label :primary_contact_title, 'Title' %>
+        <%= f.text_field :primary_contact_title %>
+      </div>
+      <div class="field">
+        <%= f.label :primary_contact_email, 'Email Address' %>
+        <%= f.text_field :primary_contact_email %>
+      </div>
+      <div class="field">
+        <%= label_tag :primary_contact_password, 'Password' %>
+        <%= password_field_tag :primary_contact_password %>
+        <p>You will use your primary contact email and this password to sign in.</p>
+      </div>
+      <div class="field">
+        <%= f.label :phone, 'Phone Number' %>
+        <%= f.text_field :phone, data: { pattern: '({{999}}) {{999}}-{{9999}}' } %>
+      </div>
+      <div class="field">
+        <%= f.label :fax %>
+        <%= f.text_field :fax, data: { pattern: '({{999}}) {{999}}-{{9999}}' } %>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Billing Contact</legend>
+      <div class="field">
+        <%= f.label :billing_same_as_mailing, 'Use mailing address and primary contact?', style: 'width: auto' %>
+        <%= f.check_box :billing_same_as_mailing, {}, 1, 0 %>
+      </div>
+      <div class="field billing">
+        <%= f.label :billing_contact_name, 'Full Name' %>
+        <%= f.text_field :billing_contact_name %>
+      </div>
+      <div class="field billing">
+        <%= f.label :billing_contact_title, 'Title' %>
+        <%= f.text_field :billing_contact_title %>
+      </div>
+      <div class="field billing">
+        <%= f.label :billing_contact_email, 'Email Address' %>
+        <%= f.text_field :billing_contact_email %>
+      </div>
+      <div class="field billing">
+        <%= f.label :billing_contact_phone, 'Phone Number' %>
+        <%= f.text_field :billing_contact_phone, data: { pattern: '({{999}}) {{999}}-{{9999}}' } %>
+      </div>
+      <%= render partial: 'shared/address_fields', locals: { address_type: 'billing', f: f } %>
+    </fieldset>
+
+    <div class="field">
+      <%= f.submit 'Save' %>
+
+      <% if current_user.is_admin? && @client.id.present? %>
+        <%= link_to 'Suspend', toggle_suspended_client_url(@client), class: 'fake-submit' %>
+      <% end %>
+    </div>
+<% end %>

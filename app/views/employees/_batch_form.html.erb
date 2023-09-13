@@ -1,0 +1,34 @@
+<%= form_tag create_batch_client_employees_url(@client), multipart: true do %>
+    <% if @error.present? %>
+        <div class="flash error"><%= @error %></div>
+    <% end %>
+
+    <ul class="info">
+      <li>To add multiple employees in a single batch, please download and fill
+        out <%= link_to 'this form', '/employees_form.csv' %> in Excel. When you are done entering information, upload
+        the form here.
+      </li>
+      <li>Please do not remove the first row, containing the headings.</li>
+      <li>When entering dates of birth, please enter them in MM/DD/YY format. For example, August 1st, 1980 would be
+        08/01/80.
+      </li>
+      <li>Please make sure you save the file before uploading it here.</li>
+      <%= render partial: 'entry_info' %>
+    </ul>
+
+    <h3>Please upload the filled-in form using the button below.</h3>
+    <div class="field">
+      <%= file_field_tag :batch_file %>
+    </div>
+
+    <br/>
+
+    <div class="field">
+      <%= label_tag :run_report_now, 'Run initial report?' %>
+      <%= check_box_tag :run_report_now %>
+    </div>
+
+    <div class="field">
+      <%= submit_tag 'Add Employees' %>
+    </div>
+<% end %>
